@@ -12,6 +12,13 @@ type Props = NativeStackScreenProps<RootStackParamList, "AddEdit">;
 
 const allDows = [1, 2, 3, 4, 5, 6, 7];
 
+
+function appDowToExpoWeekday(day: number): number {
+  // App: 1..7 => lunes..domingo
+  // Expo weekday: 1..7 => domingo..sábado
+  return day === 7 ? 1 : day + 1;
+}
+
 async function cancelNotifications(ids: string[]) {
   for (const id of ids) {
     try {
@@ -34,7 +41,7 @@ async function scheduleForReminder(r: Omit<Reminder, "id"> & { id: number }): Pr
     for (const weekday of r.daysOfWeek) {
       const id = await Notifications.scheduleNotificationAsync({
         content: { title: r.title, body: "Toca para abrir la app y marcarlo como hecho.", sound: "default" },
-        trigger: { weekday, hour: r.hour, minute: r.minute, repeats: true, channelId: "reminders" } as any,
+        trigger: { weekday: appDowToExpoWeekday(weekday), hour: r.hour, minute: r.minute, repeats: true, channelId: "reminders" } as any,
       });
       ids.push(id);
     }
